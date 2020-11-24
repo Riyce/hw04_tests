@@ -1,5 +1,7 @@
 from django.db import models
+
 from django.contrib.auth import get_user_model
+
 
 User = get_user_model()
 
@@ -23,24 +25,24 @@ class Post(models.Model):
         'Текст',
     )
     pub_date = models.DateTimeField(
-        "date published",
+        'date published',
         auto_now_add=True,
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="posts",
+        related_name='posts',
     )
     group = models.ForeignKey(
         Group,
         on_delete=models.SET_NULL,
-        related_name="posts",
+        related_name='posts',
         blank=True,
         null=True,
     )
 
     class Meta:
-        ordering = ("-pub_date",)
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.text[:15]

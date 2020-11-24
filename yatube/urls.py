@@ -8,14 +8,14 @@ urlpatterns = [
         path('auth/', include('users.urls')),
         path('auth/', include('django.contrib.auth.urls')),
         path(
-            'about-author/', 
-            views.flatpage, 
-            {'url': '/about-author/'}, 
+            'about-author/',
+            views.flatpage,
+            {'url': '/about-author/'},
             name='about'),
         path(
-            'about-spec/', 
-            views.flatpage, 
-            {'url': '/about-spec/'}, 
+            'about-spec/',
+            views.flatpage,
+            {'url': '/about-spec/'},
             name='about-spec'),
         path('', include('posts.urls')),
 ]

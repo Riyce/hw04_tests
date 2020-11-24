@@ -139,3 +139,4 @@ LOGOUT_REDIRECT_URL = "index"
 
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 SITE_ID = 2
+

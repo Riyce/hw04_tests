@@ -4,18 +4,18 @@
 {% block content %}
     {% for post in page %}
         <h3>
-            Автор: <a class="p-2 text-dark" href="/{{post.author.username}}"><span style="color:red">{{ post.author.get_full_name }}</span></a>, 
+            Автор: <a class="p-2 text-dark" href="{% url 'profile' post.author.username %}"><span style="color:red">{{ post.author.get_full_name }}</span></a>, 
             Дата публикации: {{ post.pub_date|date:"d M Y" }}
         </h3>
         <p>{{ post.text|linebreaksbr }}</p>
         {% if post.group %}
-            <p class="p-2 text-dark">Пост группы:<a class="p-2 text-dark" href="group/{{post.group.slug}}"><span style="color:red">{{ post.group }}</span></a></p>
+            <p class="p-2 text-dark">Пост группы:<a class="p-2 text-dark" href="{% url 'group' post.group.slug %}"><span style="color:red">{{ post.group }}</span></a></p>
         {% else %}
             <p class="p-2 text-dark">Этот пост не относится к ни одной из существующих групп.</p>
         {% endif %}   
         {% if not forloop.last %}<hr>{% endif %}
     {% endfor %}
     {% if page.has_other_pages %}
-        {% include "paginator.html" with items=page paginator=paginator%}
+        {% include "includes/paginator.html" with items=page paginator=paginator%}
     {% endif %}
 {% endblock %}

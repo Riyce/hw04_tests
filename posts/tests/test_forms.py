@@ -1,9 +1,13 @@
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
+
 from django.test import Client, TestCase
-from posts.forms import PostForm
-from posts.models import Post
+
 from django.urls import reverse
+
+from posts.forms import PostForm
+
+from posts.models import Post
+
 
 class PostFormTests(TestCase):
     @classmethod
@@ -11,19 +15,16 @@ class PostFormTests(TestCase):
         super().setUpClass()
         User = get_user_model()
         User.objects.create_user(username='Oleg')
-        cls.user = User.objects.get(id=1)
+        cls.user = User.objects.get(username='Oleg')
         Post.objects.create(
             text='Тестовый пост',
-            author=cls.user
+            author=cls.user,
+            pk=1,
         )
         cls.post = Post.objects.get(pk=1)
         cls.form = PostForm()
-    
-    def setUp(self):
-        self.guest_client = Client()
-        self.guest_client = Client()
-        self.authorized_client = Client()
-        self.authorized_client.force_login(PostFormTests.user)
+        cls.authorized_client = Client()
+        cls.authorized_client.force_login(cls.user)
 
     def test_help_texts(self):
         help_texts = {
@@ -48,23 +49,28 @@ class PostFormTests(TestCase):
     def test_create_post(self):
         posts_count = Post.objects.count()
         form_data = {
-            'text': 'Тестовый текст',
+            'text': 'Тестовый текст другого поста',
+            'pk': 2,
         }
-        response = self.authorized_client.post(
+        response = PostFormTests.authorized_client.post(
             reverse('new_post'),
             data=form_data,
             follow=True
         )
         self.assertRedirects(response, reverse('index'))
         self.assertEqual(Post.objects.count(), posts_count + 1)
+        self.assertEqual(
+            Post.objects.get(pk=2).text,
+            'Тестовый текст другого поста'
+        )
 
     def test_edit_post(self):
         form_data = {
             'text': 'Тестовый текст измененный',
         }
-        response = self.authorized_client.post(
+        PostFormTests.authorized_client.post(
             reverse(
-                'post_edit', 
+                'post_edit',
                 kwargs={
                     'username': PostFormTests.user,
                     'post_id': PostFormTests.post.pk,
@@ -73,7 +79,5 @@ class PostFormTests(TestCase):
             data=form_data,
             follow=True,
         )
-        self.assertEqual(
-            Post.objects.get(pk=1).text, 
-            'Тестовый текст измененный'
-        )     
+        edited_post = Post.objects.get(pk=PostFormTests.post.pk)
+        self.assertEqual(edited_post.text, 'Тестовый текст измененный')
