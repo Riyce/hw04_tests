@@ -1,6 +1,5 @@
-from django.test import TestCase
-
 from django.contrib.auth import get_user_model
+from django.test import TestCase
 
 from posts.models import Group, Post
 
@@ -10,20 +9,16 @@ class ModelsTest(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         User = get_user_model()
-        User.objects.create_user(username='Oleg')
-        user = User.objects.get(username='Oleg')
-        Post.objects.create(
+        cls.user = User.objects.create_user(username='Oleg')
+        cls.post = Post.objects.create(
             text='Тестовый текст с длиной больше 15 символов',
-            author=user,
-            pk=1,
+            author=cls.user,
         )
-        cls.post = Post.objects.get(pk=1)
-        Group.objects.create(
+        cls.group = Group.objects.create(
             title='Тестовая группа',
             description='Тестовое поисание',
             slug='test-task'
         )
-        cls.group = Group.objects.get(slug='test-task')
 
     def test_group_verbose_name(self):
         group = ModelsTest.group

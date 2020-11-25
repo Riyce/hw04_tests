@@ -1,28 +1,23 @@
-from django.test import Client, TestCase
-
 from django.contrib.auth import get_user_model
-
 from django.contrib.flatpages.models import FlatPage, Site
+from django.test import Client, TestCase
+from django.urls import reverse
 
 from posts.models import Group, Post
-
-from django.urls import reverse
 
 
 class StaticURLTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        User = get_user_model()
         cls.guest_client = Client()
-        cls.user1 = User.objects.create_user(username='Oleg')
-        cls.user2 = User.objects.create_user(username='Olegson')
-        cls.user = User.objects.get(username='Oleg')
+        cls.user1 = get_user_model().objects.create_user(username='Oleg')
+        cls.user2 = get_user_model().objects.create_user(username='Olegson')
         cls.author = Client()
         cls.author.force_login(cls.user1)
         cls.authorized_client = Client()
         cls.authorized_client.force_login(cls.user2)
-        cls.site = Site.objects.get(pk=2)
+        cls.site = Site.objects.get_current()
         cls.site.save()
         cls.flat_about = FlatPage.objects.create(
             url='/about-author/',
@@ -38,18 +33,16 @@ class StaticURLTests(TestCase):
         cls.flat_tech.save()
         cls.flat_about.sites.add(cls.site)
         cls.flat_tech.sites.add(cls.site)
-        Post.objects.create(
+        cls.post = Post.objects.create(
             text='Тестовый текст',
-            author=cls.user,
+            author=cls.user1,
             pk=1,
         )
-        cls.post = Post.objects.get(pk=1)
-        Group.objects.create(
+        cls.group = Group.objects.create(
             title='Тестовая группа',
             description='Тестовое описание группы',
             slug='test-slug'
         )
-        cls.group = Group.objects.get(slug='test-slug')
 
     def test_pages_for_client(self):
         status_codes = {
@@ -62,13 +55,13 @@ class StaticURLTests(TestCase):
             200,
             reverse(
                 'profile',
-                kwargs={'username': StaticURLTests.user.username, }
+                kwargs={'username': StaticURLTests.user1.username, }
             ):
             200,
             reverse(
                 'post',
                 kwargs={
-                    'username': StaticURLTests.user.username,
+                    'username': StaticURLTests.user1.username,
                     'post_id': StaticURLTests.post.pk
                 }
             ):
@@ -76,7 +69,7 @@ class StaticURLTests(TestCase):
             reverse(
                 'post_edit',
                 kwargs={
-                    'username': StaticURLTests.user.username,
+                    'username': StaticURLTests.user1.username,
                     'post_id': StaticURLTests.post.pk
                 }
             ):
@@ -100,14 +93,14 @@ class StaticURLTests(TestCase):
             200,
             reverse(
                 'profile',
-                kwargs={'username': StaticURLTests.user.username, }
+                kwargs={'username': StaticURLTests.user1.username, }
             ):
             200,
             reverse(
                 'post',
                 kwargs={
                     'username':
-                    StaticURLTests.user.username,
+                    StaticURLTests.user1.username,
                     'post_id': StaticURLTests.post.pk
                 }
             ):
@@ -115,7 +108,7 @@ class StaticURLTests(TestCase):
             reverse(
                 'post_edit',
                 kwargs={
-                    'username': StaticURLTests.user.username,
+                    'username': StaticURLTests.user1.username,
                     'post_id': StaticURLTests.post.pk
                 }
             ):
@@ -134,7 +127,7 @@ class StaticURLTests(TestCase):
             reverse(
                 'post',
                 kwargs={
-                    'username': StaticURLTests.user.username,
+                    'username': StaticURLTests.user1.username,
                     'post_id': StaticURLTests.post.pk
                 }
             ),
@@ -142,7 +135,7 @@ class StaticURLTests(TestCase):
             reverse(
                 'post',
                 kwargs={
-                    'username': StaticURLTests.user.username,
+                    'username': StaticURLTests.user1.username,
                     'post_id': StaticURLTests.post.pk
                 }
             ),
@@ -153,7 +146,7 @@ class StaticURLTests(TestCase):
                     reverse(
                         'post_edit',
                         kwargs={
-                            'username': StaticURLTests.user.username,
+                            'username': StaticURLTests.user1.username,
                             'post_id': StaticURLTests.post.pk
                         }
                     )
@@ -165,7 +158,7 @@ class StaticURLTests(TestCase):
             reverse(
                 'post_edit',
                 kwargs={
-                    'username': StaticURLTests.user.username,
+                    'username': StaticURLTests.user1.username,
                     'post_id': StaticURLTests.post.pk
                 }
             )

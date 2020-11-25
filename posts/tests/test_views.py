@@ -1,11 +1,7 @@
 from django import forms
-
 from django.contrib.auth import get_user_model
-
 from django.contrib.flatpages.models import FlatPage, Site
-
 from django.test import Client, TestCase
-
 from django.urls import reverse
 
 from posts.models import Group, Post
@@ -15,12 +11,12 @@ class PagesTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        Group.objects.create(
+        cls.group1 = Group.objects.create(
             title='Тестовая группа',
             description='Тестовое описание группы',
             slug='test-slug'
         )
-        cls.site = Site.objects.get(pk=2)
+        cls.site = Site.objects.get_current()
         cls.site.save()
         cls.flat_about = FlatPage.objects.create(
             url='/about-author/',
@@ -36,23 +32,20 @@ class PagesTests(TestCase):
         cls.flat_tech.save()
         cls.flat_about.sites.add(cls.site)
         cls.flat_tech.sites.add(cls.site)
-        Group.objects.create(
+        cls.group2 = Group.objects.create(
             title='Тестовая группа 2',
             description='Тестовое описание группы 2',
             slug='test-slug2'
         )
-        cls.group1 = Group.objects.get(slug='test-slug')
-        cls.group2 = Group.objects.get(slug='test-slug2')
         cls.guest_client = Client()
         cls.user = get_user_model().objects.create_user(username='Oleg')
         cls.authorized_client = Client()
         cls.authorized_client.force_login(cls.user)
-        Post.objects.create(
+        cls.post = Post.objects.create(
             text='Тестовый текст',
             group=PagesTests.group1,
             author=cls.user,
         )
-        cls.post = Post.objects.get(text='Тестовый текст')
 
     def test_pages_uses_correct_template(self):
         templates_pages_names = {

@@ -1,11 +1,8 @@
 from django.contrib.auth import get_user_model
-
 from django.test import Client, TestCase
-
 from django.urls import reverse
 
 from posts.forms import PostForm
-
 from posts.models import Post
 
 
@@ -14,14 +11,12 @@ class PostFormTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         User = get_user_model()
-        User.objects.create_user(username='Oleg')
-        cls.user = User.objects.get(username='Oleg')
-        Post.objects.create(
+        cls.user = User.objects.create_user(username='Oleg')
+        cls.post = Post.objects.create(
             text='Тестовый пост',
             author=cls.user,
             pk=1,
         )
-        cls.post = Post.objects.get(pk=1)
         cls.form = PostForm()
         cls.authorized_client = Client()
         cls.authorized_client.force_login(cls.user)
