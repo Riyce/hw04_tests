@@ -36,7 +36,6 @@ class StaticURLTests(TestCase):
         cls.post = Post.objects.create(
             text='Тестовый текст',
             author=cls.user1,
-            pk=1,
         )
         cls.group = Group.objects.create(
             title='Тестовая группа',
@@ -99,8 +98,7 @@ class StaticURLTests(TestCase):
             reverse(
                 'post',
                 kwargs={
-                    'username':
-                    StaticURLTests.user1.username,
+                    'username': StaticURLTests.user1.username,
                     'post_id': StaticURLTests.post.pk
                 }
             ):

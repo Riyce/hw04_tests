@@ -15,7 +15,6 @@ class PostFormTests(TestCase):
         cls.post = Post.objects.create(
             text='Тестовый пост',
             author=cls.user,
-            pk=1,
         )
         cls.form = PostForm()
         cls.authorized_client = Client()
@@ -45,7 +44,6 @@ class PostFormTests(TestCase):
         posts_count = Post.objects.count()
         form_data = {
             'text': 'Тестовый текст другого поста',
-            'pk': 2,
         }
         response = PostFormTests.authorized_client.post(
             reverse('new_post'),
@@ -55,7 +53,7 @@ class PostFormTests(TestCase):
         self.assertRedirects(response, reverse('index'))
         self.assertEqual(Post.objects.count(), posts_count + 1)
         self.assertEqual(
-            Post.objects.get(pk=2).text,
+            Post.objects.filter(author=PostFormTests.user).first().text,
             'Тестовый текст другого поста'
         )
 
@@ -74,5 +72,7 @@ class PostFormTests(TestCase):
             data=form_data,
             follow=True,
         )
-        edited_post = Post.objects.get(pk=PostFormTests.post.pk)
-        self.assertEqual(edited_post.text, 'Тестовый текст измененный')
+        self.assertEqual(
+            Post.objects.filter(author=PostFormTests.user).first().text,
+            'Тестовый текст измененный'
+        )
